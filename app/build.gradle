@@ -30,7 +30,7 @@ dependencies {
 }
 
 
-apply plugin: 'component-register'
+apply plugin: 'com.owm.component.register'
 componentRegister {
     // 是否开启debug模式，输出详细日志
     isDebug = false
