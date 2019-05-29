@@ -1,0 +1,33 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies {
+    //gradle sdk
+    implementation gradleApi()
+    //groovy sdk
+    implementation localGroovy()
+
+    //noinspection GradleDependency
+    implementation "com.android.tools.build:gradle:3.2.0"
+    implementation "javassist:javassist:3.12.1.GA"
+    implementation "commons-io:commons-io:2.6"
+}
+
+repositories {
+    mavenCentral()
+}
+
+//打包到本地Maven库
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // 本地Maven仓库
+            repository(url: uri('../plugin'))
+
+            // maven 配置  classpath "com.owm.component:register:1.0.5"
+            pom.groupId = 'com.owm.component'
+            pom.artifactId = 'register'
+            pom.version = '1.0.5'
+        }
+    }
+}
