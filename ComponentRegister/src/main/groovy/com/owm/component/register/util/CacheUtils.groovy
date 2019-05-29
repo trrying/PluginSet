@@ -13,15 +13,25 @@ import java.nio.charset.Charset
  * Created by "ouweiming" on 2019/5/17.
  */
 class CacheUtils {
-
+    // 缓存文件夹，在构建目录下
     final static String CACHE_INFO_DIR = "component_register"
-
+    // 缓存文件
     final static String CACHE_CONFIG_FILE_NAME = "config.txt"
 
+    /**
+     * 保存配置信息
+     * @param project project
+     * @param configInfo 配置信息
+     */
     static void saveConfigInfo(Project project, ConfigCache configInfo) {
         saveConfigCache(project, new Gson().toJson(configInfo))
     }
 
+    /**
+     * 保存配置信息
+     * @param project project
+     * @param config 配置信息
+     */
     static void saveConfigCache(Project project, String config) {
         LogUtils.i("HelperUtils-saveConfigCache :" + " project = " + project + " config = " + config)
         try {
@@ -31,6 +41,11 @@ class CacheUtils {
         }
     }
 
+    /**
+     * 读取配置缓存信息
+     * @param project project
+     * @return 配置信息
+     */
     static String readConfigCache(Project project) {
         try {
             return FileUtils.readFileToString(getRegisterInfoCacheFile(project), Charset.defaultCharset())
@@ -56,10 +71,21 @@ class CacheUtils {
         }
     }
 
+    /**
+     * 获取缓存文件夹路径
+     * @param project project
+     * @return 缓存文件夹路径
+     */
     static String getCacheFileDir(Project project) {
         return project.getBuildDir().absolutePath + File.separator + AndroidProject.FD_INTERMEDIATES + File.separator + CACHE_INFO_DIR
     }
 
+    /**
+     * 判断是否需要强制执行Task
+     * @param project project
+     * @param config 配置信息
+     * @return true：强制执行
+     */
     static boolean handleUpToDate(Project project, ComponentRegisterConfig config) {
         LogUtils.i("HelperUtils-handleUpToDate :" + " project = " + project + " config = " + config)
         Gson gson = new Gson()
