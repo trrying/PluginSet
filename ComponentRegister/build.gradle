@@ -13,8 +13,11 @@ dependencies {
     implementation "commons-io:commons-io:2.6"
 }
 
-// 发布到 plugins.gradle.org
+// 发布到 plugins.gradle.org 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> plugin portal -> publishPlugins
 apply from: "../script/gradlePlugins.gradle"
 
-// 发布到本地maven仓库
+// 发布到本地maven仓库 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> upload -> uploadArchives
 apply from: "../script/localeMaven.gradle"
+
+//发布 Jcenter 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> publishing -> bintrayUpload
+apply from: '../script/bintray.gradle'
