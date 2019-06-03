@@ -1,0 +1,15 @@
+
+//打包到本地Maven库
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // 本地Maven仓库
+            repository(url: uri('../plugin'))
+
+            // maven 配置  classpath "com.owm.component:register:1.0.5"
+            pom.groupId = gradle.groupIdName
+            pom.artifactId = gradle.artifactIdName
+            pom.version = gradle.versionName
+        }
+    }
+}
