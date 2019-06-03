@@ -1,0 +1,19 @@
+apply plugin: "com.gradle.plugin-publish"
+
+version = gradle.versionName
+
+// 打包到 https://plugins.gradle.org
+pluginBundle {
+    website = 'https://github.com/trrying'
+    vcsUrl = 'https://github.com/trrying/PluginSet'
+    description = 'component register'  //插件描述
+    tags = ['component', 'register', 'android gralde plugin']  //插件的tag。可以通过这个在插件门户上搜索
+
+    plugins {
+        greetingsPlugin {
+            id = 'com.owm.component.register'   //插件的id，到时候apply的插件id
+            displayName = 'component.register'
+        }
+    }
+}
+

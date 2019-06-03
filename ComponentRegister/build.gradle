@@ -13,5 +13,8 @@ dependencies {
     implementation "commons-io:commons-io:2.6"
 }
 
+// 发布到 plugins.gradle.org
+apply from: "../script/gradlePlugins.gradle"
+
 // 发布到本地maven仓库
 apply from: "../script/localeMaven.gradle"
