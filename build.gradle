@@ -12,7 +12,7 @@ buildscript {
         // 本地仓库
 //        maven { url uri("./plugin") }
         // bintray仓库
-        maven { url "https://dl.bintray.com/trryings/component-register/" }
+//        maven { url "https://dl.bintray.com/trryings/component-register/" }
 
         // gradle plugins 插件maven
         maven { url "https://plugins.gradle.org/m2/" }
