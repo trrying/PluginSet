@@ -14,7 +14,7 @@ class ComponentRegisterConfig {
     // 注册组件容器 HashMap，如果没有该字段则创建一个 public static final HashMap<String, Object> componentMap = new HashMap<>();
     public String componentContainer = ""
     /**
-     * componentRegisterMap = [
+     * componentRegisterList = [
      *         [
      *             "componentName": "LoginInterface", // 组件名，componentContainer容器的key
      *             "instanceClass": "com.owm.module.login.LoginManager", // 需要实例的组件
@@ -23,7 +23,7 @@ class ComponentRegisterConfig {
      *         ],
      *     ]
      */
-    public def componentRegisterMap
+    public def componentRegisterList
 
     // 是否开启debug模式，输出详细日志
     public boolean isDebug = false
@@ -35,8 +35,8 @@ class ComponentRegisterConfig {
 
     // 设置未配置项的默认值
     void setDefaultValue() {
-        if (componentRegisterMap != null) {
-            componentRegisterMap.each { component ->
+        if (componentRegisterList != null) {
+            componentRegisterList.each { component ->
                 if (component.enable == null) {
                     component.enable = true
                 }
@@ -53,7 +53,7 @@ class ComponentRegisterConfig {
                 ", componentMain=" + componentMain +
                 ", componentMethod=" + componentMethod +
                 ", componentContainer=" + componentContainer +
-                "componentRegisterMap=" + componentRegisterMap +
+                "componentRegisterList=" + componentRegisterList +
                 '}'
     }
 
@@ -63,9 +63,9 @@ class ComponentRegisterConfig {
             ", componentMain='" + componentMain + '\'' +
             ", componentMethod='" + componentMethod + '\'' +
             ", componentContainer='" + componentContainer + '\'' +
-            ", componentRegisterMap=" + componentRegisterMap +
+            ", componentRegisterList=" + componentRegisterList +
             ", directoryInputPath='" + directoryInputPath + '\'' +
             ", classPathList=" + classPathList +
-            '}';
+            '}'
     }
 }

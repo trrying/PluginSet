@@ -71,7 +71,7 @@ class BaseComponentRegisterTransform extends Transform {
 
         // 缓存需要操作的类
         def classNameList = [config.componentMain]
-        config.componentRegisterMap.each { component ->
+        config.componentRegisterList.each { component ->
             classNameList.add(component.instanceClass)
         }
 
@@ -113,7 +113,7 @@ class BaseComponentRegisterTransform extends Transform {
                             config.directoryInputPath = directoryInput.file.absolutePath
                             def result = InsertCodeUtils.insertCode(config)
                             LogUtils.i("insertCode result = ${result}")
-                            LogUtils.r("component register ${result.state ? "completed" : "error"}")
+                            LogUtils.r("${result.message}")
                             if (!result.state) {
                                 // 插入代码异常，终止编译打包
                                 throw new Exception(result.message)

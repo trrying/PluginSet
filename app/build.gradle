@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-boolean loginModuleEnable = false
+boolean loginModuleEnable = true
 
 android {
     compileSdkVersion 28
@@ -43,7 +43,7 @@ componentRegister {
     // 注册组件容器 HashMap，如果没有该字段则创建一个 public static final HashMap<String, Object> componentMap = new HashMap<>();
     componentContainer = "componentMap"
     // 注册组件配置
-    componentRegisterMap = [
+    componentRegisterList = [
         [
             "componentName": "LoginInterface",
             "instanceClass": "com.owm.module.login.LoginManager",

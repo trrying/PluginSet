@@ -19,7 +19,7 @@ class InsertCodeUtils {
      * @return 注入状态["state":true/false]
      */
     static insertCode(ComponentRegisterConfig config) {
-        def result = ["state": true]
+        def result = ["state": false, "message":"component insert cant insert"]
         def classPathCache = []
         LogUtils.i("InsertCodeUtils config = ${config.toAllString()}")
 
@@ -65,21 +65,30 @@ class InsertCodeUtils {
 
             // 注入组件实例代码
             String insertCode = ""
-            config.componentRegisterMap.each { component ->
+            // 记录组件注入情况，用于日志输出
+            def componentInsertSuccessList = []
+            def errorComponent = config.componentRegisterList.find { component ->
+                LogUtils.i("component = ${component}")
                 if (component.enable) {
                     String instanceCode = component.singleton ? "${component.instanceClass}.getInstance()" : "new ${component.instanceClass}()"
                     insertCode = """${config.componentContainer}.put("${component.componentName}", ${instanceCode});"""
                     LogUtils.i("insertCode = ${insertCode}")
                     try {
                         ctMethod.insertBefore(insertCode)
+                        componentInsertSuccessList.add(component.componentName)
+                        return false
                     } catch (Exception e) {
                         if (LogUtils.logEnable) { e.printStackTrace() }
                         result = ["state": false, "message":"""insert "${insertCode}" error : ${e.getMessage()}"""]
-                        return
+                        return true
                     }
                 }
             }
-            ctClass.writeFile(config.directoryInputPath)
+            LogUtils.i("errorComponent = ${errorComponent}")
+            if (errorComponent == null) {
+                ctClass.writeFile(config.directoryInputPath)
+                result = ["state": true, "message": "component register ${componentInsertSuccessList}"]
+            }
         } catch (Exception e) {
             LogUtils.r("""error : ${e.getMessage()}""")
             if (LogUtils.logEnable) { e.printStackTrace() }
@@ -87,7 +96,6 @@ class InsertCodeUtils {
             // 需要释放资源，否则会io占用
             if (ctClass != null) {
                 ctClass.detach()
-                ctClass = null
             }
             if (classPool != null) {
                 classPathCache.each { classPool.removeClassPath(it) }
