@@ -31,6 +31,9 @@ class ComponentRegisterConfig {
     // 插入注册代码的类根路径
     public String mainClassPath
 
+    // 在jar注入代码，避免文件占用，将真实路径文件在此，mainClassPath为临时文件
+    public String mainJarFilePath
+
     // 操作需要导包的类路径
     public List<String> classPathList = new ArrayList<>()
 

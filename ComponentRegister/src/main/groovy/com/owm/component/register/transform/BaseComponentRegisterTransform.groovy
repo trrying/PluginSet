@@ -96,7 +96,6 @@ class BaseComponentRegisterTransform extends Transform {
         }
         // 缓存-记录路径
         configInfo.destList.add(config.mainClassPath)
-
         // 保存缓存文件
         CacheUtils.saveConfigInfo(project, configInfo)
     }

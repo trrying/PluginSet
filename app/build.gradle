@@ -33,11 +33,11 @@ dependencies {
 apply plugin: 'com.owm.component.register'
 componentRegister {
     // 是否开启debug模式，输出详细日志
-    isDebug = false
+    isDebug = true
     // 是否启动组件注册
     componentRegisterEnable = true
     // 组件注册代码注入类
-    componentMain = "com.owm.pluginset.application.App"
+    componentMain = "com.owm.lib.api.ApiManager"
     // 注册代码注入类的方法
     componentMethod = "instanceModule"
     // 注册组件容器 HashMap，如果没有该字段则创建一个 public static final HashMap<String, Object> componentMap = new HashMap<>();

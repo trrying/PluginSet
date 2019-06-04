@@ -5,8 +5,13 @@ import javassist.ClassPool
 import javassist.CtClass
 import javassist.CtField
 import javassist.CtMethod
+import org.apache.commons.io.IOUtils
 
 import java.lang.reflect.Modifier
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
+import java.util.jar.JarOutputStream
+import java.util.zip.ZipEntry
 
 /**
  * Created by "ouweiming" on 2019/5/14.
@@ -83,7 +88,13 @@ class InsertCodeUtils {
             }
             LogUtils.i("errorComponent = ${errorComponent}")
             if (errorComponent == null) {
-                ctClass.writeFile(config.mainClassPath)
+                File mainClassPathFile = new File(config.mainClassPath)
+                if (mainClassPathFile.name.endsWith('.jar')) {
+                    // 将修改的类保存到jar中
+                    saveToJar(config, mainClassPathFile, ctClass.toBytecode())
+                } else {
+                    ctClass.writeFile(config.mainClassPath)
+                }
                 result = ["state": true, "message": "component register ${componentInsertSuccessList}"]
             }
         } catch (Exception e) {
@@ -100,6 +111,56 @@ class InsertCodeUtils {
             }
         }
         return result
+    }
+
+    static saveToJar(ComponentRegisterConfig config, File jarFile, byte[] codeBytes) {
+        if (!jarFile) {
+            return
+        }
+        def mainJarFile = null
+        JarOutputStream jarOutputStream = null
+        InputStream inputStream = null
+
+        try {
+            String mainClass = "${config.componentMain.replace(".", "/")}.class"
+
+            def tempJarFile = new File(config.mainJarFilePath)
+            if (tempJarFile.exists()) {
+                tempJarFile.delete()
+            }
+
+            mainJarFile = new JarFile(jarFile)
+            jarOutputStream = new JarOutputStream(new FileOutputStream(tempJarFile))
+            Enumeration enumeration = mainJarFile.entries()
+
+            while (enumeration.hasMoreElements()) {
+                try {
+                    JarEntry jarEntry = (JarEntry) enumeration.nextElement()
+                    String entryName = jarEntry.getName()
+                    ZipEntry zipEntry = new ZipEntry(entryName)
+                    inputStream = mainJarFile.getInputStream(jarEntry)
+                    jarOutputStream.putNextEntry(zipEntry)
+                    if (entryName == mainClass) {
+                        jarOutputStream.write(codeBytes)
+                    } else {
+                        jarOutputStream.write(IOUtils.toByteArray(inputStream))
+                    }
+                } catch (Exception e) {
+                    LogUtils.r("""error : ${e.getMessage()}""")
+                    if (LogUtils.logEnable) { e.printStackTrace() }
+                } finally {
+                    FileUtils.close(inputStream)
+                    if (jarOutputStream != null) {
+                        jarOutputStream.closeEntry()
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LogUtils.r("""error : ${e.getMessage()}""")
+            if (LogUtils.logEnable) { e.printStackTrace() }
+        } finally {
+            FileUtils.close(jarOutputStream, mainJarFile)
+        }
     }
 
     /**
@@ -142,15 +203,21 @@ class InsertCodeUtils {
             classPool = new ClassPool()
             classPathCache = classPool.appendClassPath(classPath)
             def clazz = config.classNameList.find {
-//                LogUtils.i("className = ${it}")
                 classPool.getOrNull(it) != null
             }
-            LogUtils.i("clazz = ${clazz}")
             if (clazz != null) {
                 config.classPathList.add(classPath)
             }
             if (clazz == config.componentMain) {
-                config.mainClassPath = classPath
+                if (classPath.endsWith(".jar")) {
+                    File src = new File(classPath)
+                    File dest = new File(src.getParent(), "temp_${src.getName()}")
+                    org.apache.commons.io.FileUtils.copyFile(src, dest)
+                    config.mainClassPath = dest.toString()
+                    config.mainJarFilePath = classPath
+                } else {
+                    config.mainClassPath = classPath
+                }
             }
         }  catch (Exception e) {
             LogUtils.r("""error : ${e.getMessage()}""")
