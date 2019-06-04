@@ -33,8 +33,12 @@ class ComponentRegisterConfig {
     // 操作需要导包的类路径
     public List<String> classPathList = new ArrayList<>()
 
+    // 需要操作或者导入的类全名称
+    public List<String> classNameList = new ArrayList<>()
+
     // 设置未配置项的默认值
     void setDefaultValue() {
+        // 给每个组件配置项设置默认值
         if (componentRegisterList != null) {
             componentRegisterList.each { component ->
                 if (component.enable == null) {
@@ -43,6 +47,15 @@ class ComponentRegisterConfig {
                 if (component.singleton == null) {
                     component.singleton = false
                 }
+            }
+        }
+
+        // 缓存需要操作或者导入的类全名称
+        classNameList.clear()
+        classNameList.add(componentMain)
+        if (componentRegisterList != null) {
+            componentRegisterList.each { component ->
+                classNameList.add(component.instanceClass)
             }
         }
     }
@@ -64,8 +77,10 @@ class ComponentRegisterConfig {
             ", componentMethod='" + componentMethod + '\'' +
             ", componentContainer='" + componentContainer + '\'' +
             ", componentRegisterList=" + componentRegisterList +
+            ", isDebug=" + isDebug +
             ", directoryInputPath='" + directoryInputPath + '\'' +
             ", classPathList=" + classPathList +
+            ", classNameList=" + classNameList +
             '}'
     }
 }

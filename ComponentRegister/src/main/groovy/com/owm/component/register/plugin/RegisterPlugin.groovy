@@ -22,7 +22,7 @@ class RegisterPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        LogUtils.i("RegisterPlugin 1.0.5 $project.name")
+        LogUtils.i("RegisterPlugin 1.0.6 $project.name")
 
         // 注册Transform
         def transform = registerTransform(project)

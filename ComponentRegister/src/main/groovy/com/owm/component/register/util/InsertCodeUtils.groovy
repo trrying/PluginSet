@@ -27,9 +27,6 @@ class InsertCodeUtils {
         ClassPool classPool = new ClassPool()
         classPool.appendSystemPath()
 
-        // 添加根目录
-        appendClassPath(classPool, classPathCache, config.directoryInputPath)
-
         // 添加类路径
         config.classPathList.each { jarPath ->
             appendClassPath(classPool, classPathCache, jarPath)
@@ -130,8 +127,37 @@ class InsertCodeUtils {
                 } catch (Exception ignored) {}
             }
             classPool.removeClassPath(classPathCache)
-        } catch (Exception ignored) {}
+        }  catch (Exception e) {
+            LogUtils.r("""error : ${e.getMessage()}""")
+            if (LogUtils.logEnable) { e.printStackTrace() }
+        }
         return result
+    }
+
+    // 检测classPath是否包含任意一个classList类
+    static scanImportClass(String classPath, ComponentRegisterConfig config) {
+        ClassPool classPool = null
+        def classPathCache = null
+        try {
+            classPool = new ClassPool()
+            classPathCache = classPool.appendClassPath(classPath)
+            def clazz = config.classNameList.find {
+//                LogUtils.i("className = ${it}")
+                classPool.getOrNull(it) != null
+            }
+            LogUtils.i("clazz = ${clazz}")
+            if (clazz != null) {
+                config.classPathList.add(classPath)
+            }
+            if (clazz == config.componentMain) {
+                config.directoryInputPath = classPath
+            }
+        }  catch (Exception e) {
+            LogUtils.r("""error : ${e.getMessage()}""")
+            if (LogUtils.logEnable) { e.printStackTrace() }
+        } finally {
+            if (classPool != null && classPathCache != null) classPool.removeClassPath(classPathCache)
+        }
     }
 
 }
