@@ -1,6 +1,8 @@
-# Android Studio gradle插件开发
+# Android Studio gradle插件开发----组件注册插件
 
-在Project ```build.gradle```添加```classpath```
+**组件注册插件**是解决在模块化化开发中无需反射、无需第三方框架、可混淆的需求。在Android Studio编译阶段根据宿主Module的插件配置信息注入插件注册代码。
+
+使用：在Project ```build.gradle```添加```classpath```
 
 ```gradle
 buildscript {
@@ -68,7 +70,9 @@ class App {
 
 ## 1. 背景
 
-组件化开发需要动态注册各个组件服务。
+组件化开发需要动态注册各个组件服务，解决在模块化化开发中无需反射、无需第三方框架、可混淆的需求。
+
+
 
 ## 2. 知识点
 
@@ -86,7 +90,9 @@ class App {
 1. aapt(Android Asset Package Tool)根据资源文件生成的R文件；
 2. app 源码；
 3. aidl文件生成接口；
-上面3条河流汇集后将被编译成class文件，现在要做的就是使用Gralde Plugin 注册一个```Transform```，在Java Compileer 之后插入，处理class文件。处理完成后交给下一步流程去继续构建。
+  上面3条河流汇集后将被编译成class文件，现在要做的就是使用Gralde Plugin 注册一个```Transform```，在Java Compileer 之后插入，处理class文件。处理完成后交给下一步流程去继续构建。
+
+
 
 ## 3. 构建插件模块
 
@@ -205,6 +211,8 @@ gralde sync 后可以在Android Studio Gradle面板找到```uploadArchives``` Ta
 当插件编写完成，双击运行```uploadArchives```Task会在配置的本地Maven仓库中生成插件。
 
 ![gradle plugin](https://raw.githubusercontent.com/trrying/images/master/images/1558690922772.png)
+
+
 
 ## 4. 组件注册插件功能实现
 
