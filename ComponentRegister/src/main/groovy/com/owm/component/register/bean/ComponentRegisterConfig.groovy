@@ -24,11 +24,12 @@ class ComponentRegisterConfig {
      *     ]
      */
     public def componentRegisterList
-
     // 是否开启debug模式，输出详细日志
     public boolean isDebug = false
+
+
     // 插入注册代码的类根路径
-    public String directoryInputPath
+    public String mainClassPath
 
     // 操作需要导包的类路径
     public List<String> classPathList = new ArrayList<>()
@@ -78,7 +79,7 @@ class ComponentRegisterConfig {
             ", componentContainer='" + componentContainer + '\'' +
             ", componentRegisterList=" + componentRegisterList +
             ", isDebug=" + isDebug +
-            ", directoryInputPath='" + directoryInputPath + '\'' +
+            ", mainClassPath='" + mainClassPath + '\'' +
             ", classPathList=" + classPathList +
             ", classNameList=" + classNameList +
             '}'

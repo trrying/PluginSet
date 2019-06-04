@@ -83,7 +83,7 @@ class InsertCodeUtils {
             }
             LogUtils.i("errorComponent = ${errorComponent}")
             if (errorComponent == null) {
-                ctClass.writeFile(config.directoryInputPath)
+                ctClass.writeFile(config.mainClassPath)
                 result = ["state": true, "message": "component register ${componentInsertSuccessList}"]
             }
         } catch (Exception e) {
@@ -150,7 +150,7 @@ class InsertCodeUtils {
                 config.classPathList.add(classPath)
             }
             if (clazz == config.componentMain) {
-                config.directoryInputPath = classPath
+                config.mainClassPath = classPath
             }
         }  catch (Exception e) {
             LogUtils.r("""error : ${e.getMessage()}""")
