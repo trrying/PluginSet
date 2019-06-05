@@ -22,7 +22,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.2.0'
 
         // 组件注册插件
-        classpath 'com.owm.component:register:1.0.6'
+        classpath 'com.owm.component:register:1.1.0'
 
         // gradle plugins 插件
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"

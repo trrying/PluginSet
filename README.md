@@ -1,19 +1,31 @@
 # Android Studio gradle插件开发----组件注册插件
 
-**组件注册插件**是解决在模块化化开发中无需反射、无需第三方框架、可混淆的需求。在Android Studio编译阶段根据宿主Module的插件配置信息注入插件注册代码。
+**组件注册插件**是解决在模块化化开发中无反射、无新增第三方框架、可混淆的需求。在Android Studio编译阶段根据宿主Module的```build.gradle```中的配置信息注入组件注册代码。
 
-使用：在Project ```build.gradle```添加```classpath```
+## 效果：
+
+使用插件前App源码：
+
+![1559701162143](https://raw.githubusercontent.com/trrying/images/master/images/1559701162143.png)
+
+使用插件后反编译App：
+
+![1559701477775](https://raw.githubusercontent.com/trrying/images/master/images/1559701477775.png)
+
+## 使用：
+
+1. 在Project ```build.gradle```添加```classpath```
 
 ```gradle
 buildscript {
     dependencies {
         // 组件注册插件
-        classpath 'com.owm.component:register:1.0.6'
+        classpath 'com.owm.component:register:1.1.0'
     }
 }
 ```
 
-在需要注册模块```build.gradle```添加配置参数
+2. 注册模块```build.gradle```添加配置参数
 
 ```gradle
 apply plugin: 'com.android.application'
@@ -51,6 +63,8 @@ componentRegister {
 
 上述配置表示在```com.owm.pluginset.application.App```类中```instanceModule```方法内首部添加 ```componentMap.put("LoginInterface", new com.owm.module.login.LoginManager());```代码。
 
+3. 在```componentMain```类创建```componentMap```方法和```componentMap```容器。
+
 ```java
 class App {
     public static final HashMap<String, Object> componentMap = new HashMap<>();
@@ -60,18 +74,16 @@ class App {
 }
 ```
 
+Gradle同步重新构建项目出现下列输入表示注入成功。
+
 ![1559558005181](https://raw.githubusercontent.com/trrying/images/master/images/1559558005181.png)
 
-
-
 **详细例子和插件代码：[https://github.com/trrying/PluginSet](https://github.com/trrying/PluginSet)**
-
 
 
 ## 1. 背景
 
 组件化开发需要动态注册各个组件服务，解决在模块化化开发中无需反射、无需第三方框架、可混淆的需求。
-
 
 
 ## 2. 知识点
@@ -90,16 +102,10 @@ class App {
 1. aapt(Android Asset Package Tool)根据资源文件生成的R文件；
 2. app 源码；
 3. aidl文件生成接口；
-  上面3条河流汇集后将被编译成class文件，现在要做的就是使用Gralde Plugin 注册一个```Transform```，在Java Compileer 之后插入，处理class文件。处理完成后交给下一步流程去继续构建。
-
+    上面3条河流汇集后将被编译成class文件，现在要做的就是使用Gralde Plugin 注册一个```Transform```，在Java Compileer 之后插入，处理class文件。处理完成后交给下一步流程去继续构建。
 
 
 ## 3. 构建插件模块
-
-​	
-
-​					
-
 #### 3.1 创建插件模块
 
 在项目中创建Android Library Module（其他模块也行，只要目录结构对应下面），创建完成后删除多余目录和文件，只保留```src```目录和```build.gradle```文件。
@@ -115,7 +121,7 @@ PluginSet
 │  │
 │  └─src
 │      └─main
-│          ├─groovy // 
+│          ├─groovy //
 │          │  └─com
 │          │      └─owm
 │          │          └─component
@@ -183,24 +189,14 @@ dependencies {
     implementation "commons-io:commons-io:2.6"
 }
 
-repositories {
-    mavenCentral()
-}
+// 发布到 plugins.gradle.org 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> plugin portal -> publishPlugins
+apply from: "../script/gradlePlugins.gradle"
 
-//打包到本地Maven库
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            // 本地Maven仓库
-            repository(url: uri('../plugin'))
+// 发布到本地maven仓库 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> upload -> uploadArchives
+apply from: "../script/localeMaven.gradle"
 
-            // maven 配置  classpath "com.owm.component:register:1.0.5"
-            pom.groupId = 'com.owm.component'
-            pom.artifactId = 'register'
-            pom.version = '1.0.5'
-        }
-    }
-}
+//发布 Jcenter 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> publishing -> bintrayUpload
+apply from: '../script/bintray.gradle'
 
 ```
 
@@ -211,7 +207,6 @@ gralde sync 后可以在Android Studio Gradle面板找到```uploadArchives``` Ta
 当插件编写完成，双击运行```uploadArchives```Task会在配置的本地Maven仓库中生成插件。
 
 ![gradle plugin](https://raw.githubusercontent.com/trrying/images/master/images/1558690922772.png)
-
 
 
 ## 4. 组件注册插件功能实现
@@ -232,7 +227,7 @@ class RegisterPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        LogUtils.i("RegisterPlugin 1.0.5 $project.name")
+        LogUtils.i("RegisterPlugin 1.1.0 $project.name")
 
         // 注册Transform
         def transform = registerTransform(project)
@@ -246,9 +241,9 @@ class RegisterPlugin implements Plugin<Project> {
             // 配置项设置设置默认值
             config.setDefaultValue()
 
+            LogUtils.logEnable = config.isDebug
             LogUtils.i("RegisterPlugin apply config = ${config}")
 
-            transform.update = config.componentRegisterEnable
             transform.setConfig(config)
 
             // 保存配置缓存，判断改动设置UpToDate状态
@@ -299,6 +294,11 @@ class RegisterPlugin implements Plugin<Project> {
 ```isIncremental()```：是否支持增量；
 
 ```transform(transformInvocation)```：转换逻辑处理；
+
+- 判断jar是否需要导包，是则加入导包列表
+- 判断class是否需要导包，是则加入导包列表
+- 根据config配置注入代码
+- 保存缓存
 
 **注意：**library模块范围只能配置为当前模块；
 
@@ -352,71 +352,40 @@ class BaseComponentRegisterTransform extends Transform {
 
         // 缓存信息，决解UpTpDate缓存无法控制问题
         ConfigCache configInfo = new ConfigCache()
-        configInfo.configString = config.toString()
-
-        boolean leftSlash = File.separator == '/'
-
-        // 组件注册代码插入类
-        String componentMain = "${config.componentMain.replace(".", "/")}.class"
-
-        // 缓存需要操作的类
-        def classNameList = [config.componentMain]
-        config.componentRegisterMap.each { component ->
-            classNameList.add(component.instanceClass)
-        }
+        configInfo.configString = config.configString()
 
         // 遍历输入文件
         transformInvocation.getInputs().each { TransformInput input ->
             // 遍历jar
             input.jarInputs.each { JarInput jarInput ->
                 File dest = transformInvocation.outputProvider.getContentLocation(jarInput.name, jarInput.contentTypes, jarInput.scopes, Format.JAR)
-                // 暂不修改jar，原样输出
+                // 复制jar到目标目录
                 FileUtils.copyFile(jarInput.file, dest)
                 // 查看是否需要导包，是则加入导包列表
-                if (InsertCodeUtils.classPathContainClass(dest.toString(), classNameList)) { config.classPathList.add(dest.toString()) }
+                InsertCodeUtils.scanImportClass(dest.toString(), config)
             }
 
-            // 遍历源码
+            // 遍历源码目录文件
             input.directoryInputs.each { DirectoryInput directoryInput ->
-                LogUtils.i("directoryInput = $directoryInput")
                 // 获得输出的目录
                 File dest = transformInvocation.outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY)
-                LogUtils.i("dest = $dest")
-                // 根目录
-                String root = directoryInput.file.absolutePath
-                if (!root.endsWith(File.separator)) {
-                    root += File.separator
-                }
-                LogUtils.i("root = $root")
-                //遍历目录下的每个文件
-                directoryInput.file.eachFileRecurse { File file ->
-                    LogUtils.i("file = $file")
-                    // 去掉根路径，以类包名路径操作
-                    def path = file.absolutePath.replace(root, '')
-                    if (file.isFile()) {
-                        def entryName = path
-                        if (!leftSlash) {
-                            entryName = entryName.replaceAll("\\\\", "/")
-                        }
-                        if (componentMain == entryName) {
-                            // 类路径
-                            config.directoryInputPath = directoryInput.file.absolutePath
-                            def result = InsertCodeUtils.insertCode(config)
-                            LogUtils.i("insertCode result = ${result}")
-                            LogUtils.r("component register ${result.state ? "completed" : "error"}")
-                            if (!result.state) {
-                                // 插入代码异常，终止编译打包
-                                throw new Exception(result.message)
-                            }
-                            // 缓存-记录路径
-                            configInfo.destList.add(file.absolutePath.replace(root, "${dest.absolutePath}${File.separator}"))
-                        }
-                    }
-                }
-                // 处理完后拷到目标文件
+                // 复制文件夹到目标目录
                 FileUtils.copyDirectory(directoryInput.file, dest)
+                // 查看是否需要导包，是则加入导包列表
+                InsertCodeUtils.scanImportClass(dest.toString(), config)
             }
         }
+
+        // 代码注入
+        def result = InsertCodeUtils.insertCode(config)
+        LogUtils.i("insertCode result = ${result}")
+        LogUtils.r("${result.message}")
+        if (!result.state) {
+            // 插入代码异常，终止编译打包
+            throw new Exception(result.message)
+        }
+        // 缓存-记录路径
+        configInfo.destList.add(config.mainClassPath)
         // 保存缓存文件
         CacheUtils.saveConfigInfo(project, configInfo)
     }
@@ -428,9 +397,7 @@ class BaseComponentRegisterTransform extends Transform {
     void setConfig(ComponentRegisterConfig config) {
         this.config = config
     }
-
 }
-
 ```
 
 在```transform(TransformInvocation transformInvocation)```方法中的参数包含需要操作的数据。使用```getInputs()```获取输入的class或者jar内容，遍历扫描到匹配的类，将的组件实例代码注入到类中，再将文件复制到```getOutputProvider()```获取class或者jar对应的输出路径里面。
@@ -475,16 +442,13 @@ class InsertCodeUtils {
      * @return 注入状态["state":true/false]
      */
     static insertCode(ComponentRegisterConfig config) {
-        def result = ["state": true]
+        def result = ["state": false, "message":"component insert cant insert"]
         def classPathCache = []
-        LogUtils.i("InsertCodeUtils config = ${config.toAllString()}")
+        LogUtils.i("InsertCodeUtils config = ${config}")
 
         // 实例类池
         ClassPool classPool = new ClassPool()
         classPool.appendSystemPath()
-
-        // 添加根目录
-        appendClassPath(classPool, classPathCache, config.directoryInputPath)
 
         // 添加类路径
         config.classPathList.each { jarPath ->
@@ -521,21 +485,36 @@ class InsertCodeUtils {
 
             // 注入组件实例代码
             String insertCode = ""
-            config.componentRegisterMap.each { component ->
+            // 记录组件注入情况，用于日志输出
+            def componentInsertSuccessList = []
+            def errorComponent = config.componentRegisterList.find { component ->
+                LogUtils.i("component = ${component}")
                 if (component.enable) {
                     String instanceCode = component.singleton ? "${component.instanceClass}.getInstance()" : "new ${component.instanceClass}()"
                     insertCode = """${config.componentContainer}.put("${component.componentName}", ${instanceCode});"""
                     LogUtils.i("insertCode = ${insertCode}")
                     try {
                         ctMethod.insertBefore(insertCode)
+                        componentInsertSuccessList.add(component.componentName)
+                        return false
                     } catch (Exception e) {
                         if (LogUtils.logEnable) { e.printStackTrace() }
                         result = ["state": false, "message":"""insert "${insertCode}" error : ${e.getMessage()}"""]
-                        return
+                        return true
                     }
                 }
             }
-            ctClass.writeFile(config.directoryInputPath)
+            LogUtils.i("errorComponent = ${errorComponent}")
+            if (errorComponent == null) {
+                File mainClassPathFile = new File(config.mainClassPath)
+                if (mainClassPathFile.name.endsWith('.jar')) {
+                    // 将修改的类保存到jar中
+                    saveToJar(config, mainClassPathFile, ctClass.toBytecode())
+                } else {
+                    ctClass.writeFile(config.mainClassPath)
+                }
+                result = ["state": true, "message": "component register ${componentInsertSuccessList}"]
+            }
         } catch (Exception e) {
             LogUtils.r("""error : ${e.getMessage()}""")
             if (LogUtils.logEnable) { e.printStackTrace() }
@@ -543,7 +522,6 @@ class InsertCodeUtils {
             // 需要释放资源，否则会io占用
             if (ctClass != null) {
                 ctClass.detach()
-                ctClass = null
             }
             if (classPool != null) {
                 classPathCache.each { classPool.removeClassPath(it) }
@@ -551,6 +529,56 @@ class InsertCodeUtils {
             }
         }
         return result
+    }
+
+    static saveToJar(ComponentRegisterConfig config, File jarFile, byte[] codeBytes) {
+        if (!jarFile) {
+            return
+        }
+        def mainJarFile = null
+        JarOutputStream jarOutputStream = null
+        InputStream inputStream = null
+
+        try {
+            String mainClass = "${config.componentMain.replace(".", "/")}.class"
+
+            def tempJarFile = new File(config.mainJarFilePath)
+            if (tempJarFile.exists()) {
+                tempJarFile.delete()
+            }
+
+            mainJarFile = new JarFile(jarFile)
+            jarOutputStream = new JarOutputStream(new FileOutputStream(tempJarFile))
+            Enumeration enumeration = mainJarFile.entries()
+
+            while (enumeration.hasMoreElements()) {
+                try {
+                    JarEntry jarEntry = (JarEntry) enumeration.nextElement()
+                    String entryName = jarEntry.getName()
+                    ZipEntry zipEntry = new ZipEntry(entryName)
+                    inputStream = mainJarFile.getInputStream(jarEntry)
+                    jarOutputStream.putNextEntry(zipEntry)
+                    if (entryName == mainClass) {
+                        jarOutputStream.write(codeBytes)
+                    } else {
+                        jarOutputStream.write(IOUtils.toByteArray(inputStream))
+                    }
+                } catch (Exception e) {
+                    LogUtils.r("""error : ${e.getMessage()}""")
+                    if (LogUtils.logEnable) { e.printStackTrace() }
+                } finally {
+                    FileUtils.close(inputStream)
+                    if (jarOutputStream != null) {
+                        jarOutputStream.closeEntry()
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LogUtils.r("""error : ${e.getMessage()}""")
+            if (LogUtils.logEnable) { e.printStackTrace() }
+        } finally {
+            FileUtils.close(jarOutputStream, mainJarFile)
+        }
     }
 
     /**
@@ -564,25 +592,37 @@ class InsertCodeUtils {
     }
 
     // 检测classPath是否包含任意一个classList类
-    static boolean classPathContainClass(String classPath, List<String> classList) {
-        boolean result = false
+    static scanImportClass(String classPath, ComponentRegisterConfig config) {
+        ClassPool classPool = null
+        def classPathCache = null
         try {
-            ClassPool classPool = new ClassPool()
-            def classPathCache = classPool.appendClassPath(classPath)
-            for (int i = 0; i < classList.size(); i++) {
-                try {
-                    if (classPool.getOrNull(classList.get(i)) != null) {
-                        result = true
-                        break
-                    }
-                } catch (Exception ignored) {}
+            classPool = new ClassPool()
+            classPathCache = classPool.appendClassPath(classPath)
+            def clazz = config.classNameList.find {
+                classPool.getOrNull(it) != null
             }
-            classPool.removeClassPath(classPathCache)
-        } catch (Exception ignored) {}
-        return result
+            if (clazz != null) {
+                config.classPathList.add(classPath)
+            }
+            if (clazz == config.componentMain) {
+                if (classPath.endsWith(".jar")) {
+                    File src = new File(classPath)
+                    File dest = new File(src.getParent(), "temp_${src.getName()}")
+                    org.apache.commons.io.FileUtils.copyFile(src, dest)
+                    config.mainClassPath = dest.toString()
+                    config.mainJarFilePath = classPath
+                } else {
+                    config.mainClassPath = classPath
+                }
+            }
+        }  catch (Exception e) {
+            LogUtils.r("""error : ${e.getMessage()}""")
+            if (LogUtils.logEnable) { e.printStackTrace() }
+        } finally {
+            if (classPool != null && classPathCache != null) classPool.removeClassPath(classPathCache)
+        }
     }
 }
-
 ```
 
 #### 4.4 使用缓存决解UpToDate
@@ -731,109 +771,6 @@ class CacheUtils {
 }
 
 ```
-
-#### 5.本地仓库使用
-
-在项目build.gradle添加依赖 ```classpath 'com.owm.component:register:1.0.5'```
-
-```gradle
-buildscript {
-    repositories {
-        google()
-        jcenter()
-        maven { url uri("./plugin") }
-    }
-    dependencies {
-        //noinspection GradleDependency
-        classpath 'com.android.tools.build:gradle:3.2.0'
-        classpath 'com.owm.component:register:1.0.5'
-    }
-}
-```
-
-在注入组件注册代码模块build.gradle应用插件和添加配置
-
-```gradle
-apply plugin: 'com.android.application'
-
-boolean loginModuleEnable = true
-
-android {
-    ...
-}
-
-dependencies {
-    ...
-    if (loginModuleEnable) {
-        implementation project(':ModuleLogin')
-    }
-}
-
-apply plugin: 'com.owm.component.register'
-componentRegister {
-    // 是否开启debug模式，输出详细日志
-    isDebug = false
-    // 是否启动组件注册
-    componentRegisterEnable = true
-    // 组件注册代码注入类
-    componentMain = "com.owm.pluginset.application.App"
-    // 注册代码注入类的方法
-    componentMethod = "instanceModule"
-    // 注册组件容器 HashMap，如果没有该字段则创建一个 public static final HashMap<String, Object> componentMap = new HashMap<>();
-    componentContainer = "componentMap"
-    // 注册组件配置
-    componentRegisterList = [
-        [
-            "componentName": "LoginInterface",
-            "instanceClass": "com.owm.module.login.LoginManager",
-            "enable"       : loginModuleEnable, // 默认为：true
-            "singleton"    : false, // 默认为：false，是否单例实现，为true调用Xxx.getInstance()，否则调用new Xxx();
-        ],
-    ]
-}
-```
-
-创建组件注册代码注入类，创建注入类的方法和容器。
-
-```java
-package com.owm.pluginset.application;
-
-import android.app.Application;
-
-import com.owm.lib.api.ApiManager;
-import com.owm.lib.api.LoginInterface;
-
-import java.util.HashMap;
-
-public class App extends Application {
-
-    public static final HashMap<String, Object> componentMap = new HashMap<>();
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        instanceModule();
-    }
-
-    public void instanceModule() {
-        // 插件会在这里插入代码
-        if (componentMap.containsKey("LoginInterface")) {
-            ApiManager.getInstance().setLoginInterface((LoginInterface) componentMap.get("LoginInterface"));
-        }
-    }
-
-}
-```
-
-在```build/rebuid```重新构建一下就会生成插入代码。
-
-![代码注入成功](https://raw.githubusercontent.com/trrying/images/master/images/1559125904909.png)
-
-第26行```componentMap.put("LoginInterface", new LoginManager());```就是利用javassist插入的组件注册代码。
-
-
-
-
 
 **参考资料**
 
