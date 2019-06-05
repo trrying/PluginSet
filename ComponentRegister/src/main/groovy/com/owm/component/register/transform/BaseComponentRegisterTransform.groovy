@@ -62,7 +62,7 @@ class BaseComponentRegisterTransform extends Transform {
 
         // 缓存信息，决解UpTpDate缓存无法控制问题
         ConfigCache configInfo = new ConfigCache()
-        configInfo.configString = config.toString()
+        configInfo.configString = config.configString()
 
         // 遍历输入文件
         transformInvocation.getInputs().each { TransformInput input ->

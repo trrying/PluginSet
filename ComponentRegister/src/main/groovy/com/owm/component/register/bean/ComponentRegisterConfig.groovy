@@ -6,7 +6,7 @@ package com.owm.component.register.bean
 class ComponentRegisterConfig {
 
     // 是否启动组件注册
-    public boolean componentRegisterEnable = true
+    public boolean componentRegisterEnable = false
     // 组件注册代码注入类
     public String componentMain = ""
     // 注册代码注入类的方法
@@ -66,16 +66,6 @@ class ComponentRegisterConfig {
 
     @Override String toString() {
         return "ComponentRegisterConfig{" +
-                ", componentRegisterEnable=" + componentRegisterEnable +
-                ", componentMain=" + componentMain +
-                ", componentMethod=" + componentMethod +
-                ", componentContainer=" + componentContainer +
-                "componentRegisterList=" + componentRegisterList +
-                '}'
-    }
-
-    String toAllString() {
-        return "ComponentRegisterConfig{" +
             "componentRegisterEnable=" + componentRegisterEnable +
             ", componentMain='" + componentMain + '\'' +
             ", componentMethod='" + componentMethod + '\'' +
@@ -83,8 +73,20 @@ class ComponentRegisterConfig {
             ", componentRegisterList=" + componentRegisterList +
             ", isDebug=" + isDebug +
             ", mainClassPath='" + mainClassPath + '\'' +
+            ", mainJarFilePath='" + mainJarFilePath + '\'' +
             ", classPathList=" + classPathList +
             ", classNameList=" + classNameList +
+            '}'
+    }
+
+    String configString() {
+        return "ComponentRegisterConfig{" +
+            "componentRegisterEnable=" + componentRegisterEnable +
+            ", componentMain=" + componentMain +
+            ", componentMethod=" + componentMethod +
+            ", componentContainer=" + componentContainer +
+            "componentRegisterList=" + componentRegisterList +
+            ", isDebug=" + isDebug +
             '}'
     }
 }

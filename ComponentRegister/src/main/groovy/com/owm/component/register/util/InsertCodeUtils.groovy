@@ -26,7 +26,7 @@ class InsertCodeUtils {
     static insertCode(ComponentRegisterConfig config) {
         def result = ["state": false, "message":"component insert cant insert"]
         def classPathCache = []
-        LogUtils.i("InsertCodeUtils config = ${config.toAllString()}")
+        LogUtils.i("InsertCodeUtils config = ${config}")
 
         // 实例类池
         ClassPool classPool = new ClassPool()

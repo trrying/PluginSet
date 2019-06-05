@@ -93,7 +93,7 @@ class CacheUtils {
         LogUtils.i("configInfoText = ${configInfoText}")
         ConfigCache configInfo = gson.fromJson(configInfoText, ConfigCache.class)
         LogUtils.i("configInfo = ${configInfo}")
-        if (configInfo != null && configInfo.configString != config.toString()) {
+        if (configInfo != null && configInfo.configString != config.configString()) {
             configInfo.destList.each {
                 LogUtils.i("delete ${it}")
                 File handleFile = new File(it)
