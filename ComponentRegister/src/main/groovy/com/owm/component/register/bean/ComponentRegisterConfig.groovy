@@ -52,12 +52,9 @@ class ComponentRegisterConfig {
                     component.singleton = false
                 }
             }
-        }
 
-        // 缓存需要操作或者导入的类全名称
-        classNameList.clear()
-        classNameList.add(componentMain)
-        if (componentRegisterList != null) {
+            // 缓存需要操作或者导入的类全名称
+            classNameList.clear()
             componentRegisterList.each { component ->
                 classNameList.add(component.instanceClass)
             }

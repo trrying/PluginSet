@@ -36,6 +36,8 @@ class InsertCodeUtils {
         config.classPathList.each { jarPath ->
             appendClassPath(classPool, classPathCache, jarPath)
         }
+        // 添加注入类根目录或者jar
+        appendClassPath(classPool, classPathCache, config.mainClassPath)
 
         CtClass ctClass = null
         try {
@@ -54,7 +56,7 @@ class InsertCodeUtils {
 
             // 判断是否有组件容器
             boolean hasComponentContainer = false
-            ctClass.fields.each { field ->
+            ctClass.getDeclaredFields().each { field ->
                 if (field.name == config.componentContainer) {
                     hasComponentContainer = true
                 }
@@ -88,11 +90,11 @@ class InsertCodeUtils {
             }
             LogUtils.i("errorComponent = ${errorComponent}")
             if (errorComponent == null) {
-                File mainClassPathFile = new File(config.mainClassPath)
-                if (mainClassPathFile.name.endsWith('.jar')) {
+                if (config.mainClassPath.endsWith('.jar')) {
                     // 将修改的类保存到jar中
-                    saveToJar(config, mainClassPathFile, ctClass.toBytecode())
+                    saveToJar(config, new File(config.mainClassPath), ctClass.toBytecode())
                 } else {
+                    // 覆写class文件
                     ctClass.writeFile(config.mainClassPath)
                 }
                 result = ["state": true, "message": "component register ${componentInsertSuccessList}"]
@@ -202,18 +204,18 @@ class InsertCodeUtils {
         try {
             classPool = new ClassPool()
             classPathCache = classPool.appendClassPath(classPath)
-            def clazz = config.classNameList.find {
-                classPool.getOrNull(it) != null
-            }
-            if (clazz != null) {
-                config.classPathList.add(classPath)
-            }
-            if (clazz == config.componentMain) {
+            // 判断是否需要添加导包
+            if (config.classNameList.find { classPool.getOrNull(it) != null } != null) { config.classPathList.add(classPath) }
+            // 判断是否包含注入类
+            if (classPool.getOrNull(config.componentMain) != null) {
                 if (classPath.endsWith(".jar")) {
+                    // 将临时jar作为导入包，防止写入时文件占用
                     File src = new File(classPath)
-                    File dest = new File(src.getParent(), "temp_${src.getName()}")
-                    org.apache.commons.io.FileUtils.copyFile(src, dest)
-                    config.mainClassPath = dest.toString()
+                    File temp = new File(src.getParent(), "temp_${src.getName()}")
+                    LogUtils.i("src = $src")
+                    LogUtils.i("temp = $temp")
+                    org.apache.commons.io.FileUtils.copyFile(src, temp)
+                    config.mainClassPath = temp.toString()
                     config.mainJarFilePath = classPath
                 } else {
                     config.mainClassPath = classPath

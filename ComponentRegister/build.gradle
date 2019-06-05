@@ -9,7 +9,7 @@ dependencies {
 
     //noinspection GradleDependency
     implementation "com.android.tools.build:gradle:3.2.0"
-    implementation "javassist:javassist:3.12.1.GA"
+    implementation "org.javassist:javassist:3.20.0-GA"
     implementation "commons-io:commons-io:2.6"
 }
 
