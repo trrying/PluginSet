@@ -20,7 +20,7 @@
 buildscript {
     dependencies {
         // 组件注册插件
-        classpath 'com.owm.component:register:1.1.0'
+        classpath 'com.owm.component:register:1.1.2'
     }
 }
 ```

@@ -2,7 +2,7 @@
 
 gradle.ext.groupIdName = 'com.owm.component'
 gradle.ext.artifactIdName = 'register'
-gradle.ext.versionName = '1.1.0'
+gradle.ext.versionName = '1.1.2'
 
 buildscript {
     repositories {
@@ -10,7 +10,7 @@ buildscript {
         jcenter()
 
         // 本地仓库
-//        maven { url uri("./plugin") }
+        maven { url uri("./plugin") }
         // bintray仓库
 //        maven { url "https://dl.bintray.com/trryings/component-register/" }
 
@@ -22,9 +22,10 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.2.0'
 
         // 组件注册插件
-        classpath 'com.owm.component:register:1.1.0'
+        classpath 'com.owm.component:register:1.1.2'
 
         // gradle plugins 插件
+        //noinspection GradleDependency
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
 
         // 发布到jcenter 需要的插件
