@@ -1,6 +1,6 @@
 # Android Studio gradle插件开发----组件注册插件
 
-**组件注册插件**是解决在模块化化开发中无反射、无新增第三方框架、可混淆的需求。在Android Studio编译阶段根据宿主Module的```build.gradle```中的配置信息注入组件注册代码。
+组件注册插件是**解决在模块化化开发中无反射、无新增第三方框架、可混淆的需求**。在Android Studio编译阶段根据宿主Module的```build.gradle```中的配置信息注入组件注册代码。
 
 ## 效果：
 
@@ -63,22 +63,21 @@ componentRegister {
 
 上述配置表示在```com.owm.pluginset.application.App```类中```instanceModule```方法内首部添加 ```componentMap.put("LoginInterface", new com.owm.module.login.LoginManager());```代码。
 
-3. 在```componentMain```类创建```componentMap```方法和```componentMap```容器。
+3. 在```componentMain```配置的类中创建```instanceModule()```方法和```componentMap```容器。
 
 ```java
 class App {
     public static final HashMap<String, Object> componentMap = new HashMap<>();
     public void instanceModule() {
-        componentMap.put("LoginInterface", new com.owm.module.login.LoginManager());
     }
 }
 ```
 
-Gradle同步重新构建项目出现下列输入表示注入成功。
+Gradle同步重新构建项目后出现下列输入表示注入成功。
 
 ![1559558005181](https://raw.githubusercontent.com/trrying/images/master/images/1559558005181.png)
 
-**详细例子和插件代码：[https://github.com/trrying/PluginSet](https://github.com/trrying/PluginSet)**
+**详细例子和插件源码，欢迎star：[https://github.com/trrying/PluginSet](https://github.com/trrying/PluginSet)**
 
 
 ## 1. 背景
@@ -102,7 +101,9 @@ Gradle同步重新构建项目出现下列输入表示注入成功。
 1. aapt(Android Asset Package Tool)根据资源文件生成的R文件；
 2. app 源码；
 3. aidl文件生成接口；
-    上面3条河流汇集后将被编译成class文件，现在要做的就是使用Gralde Plugin 注册一个```Transform```，在Java Compileer 之后插入，处理class文件。处理完成后交给下一步流程去继续构建。
+
+上面3条河流汇集后源码将被编译成class文件。
+现在要做的就是使用 Gralde Plugin 注册一个```Transform```，在Java Compileer 之后插入，处理class文件。处理完成后交给下一步流程去继续构建。
 
 
 ## 3. 构建插件模块
@@ -138,8 +139,9 @@ PluginSet
 
 主要关注有两个点
 
-1. ```src/main/groovy``` 目录放置插件代码
+1. ```src/main/groovy``` 放置插件代码
 2. ```src/main/resources``` 放置插件配置信息
+
    在```src/main/resources```下面的 ```resources/META-INF/gradle-plugins ```存放配置信息。这里可以放置多个配置信息，**每个配置信息是一个插件。**
    **配置文件名就是插件名**，例如我这里是```com.owm.component.register.properties```，应用时：```apply plugin: 'com.owm.component.register'```
 
@@ -667,11 +669,11 @@ Transform没有配置可更新或者强制更新选项，Transform依赖的Task�
 
   ![Task 编译](https://raw.githubusercontent.com/trrying/images/master/images/taskInputsOutputs.png)
 
-  在第一次执行任务之前，Gradle会对输入进行快照。此快照包含输入文件的路径和每个文件内容的哈希。Gradle然后执行任务。如果任务成功完成，Gradle将获取输出的快照。此快照包含输出文件集和每个文件内容的哈希值。Gradle会在下次执行任务时保留两个快照。
+在第一次执行任务之前，Gradle会对输入进行快照。此快照包含输入文件的路径和每个文件内容的哈希。Gradle然后执行任务。如果任务成功完成，Gradle将获取输出的快照。此快照包含输出文件集和每个文件内容的哈希值。Gradle会在下次执行任务时保留两个快照。
 
-  每次之后，在执行任务之前，Gradle会获取输入和输出的新快照。如果新快照与先前的快照相同，则Gradle会假定输出是最新的并跳过任务。如果它们不相同，Gradle将执行该任务。Gradle会在下次执行任务时保留两个快照。
+每次之后，在执行任务之前，Gradle会获取输入和输出的新快照。如果新快照与先前的快照相同，则Gradle会假定输出是最新的并跳过任务。如果它们不相同，Gradle将执行该任务。Gradle会在下次执行任务时保留两个快照。
 
-**决解方法：**基于第4点输入和输出快照变化会使Taask执行条件为true，所以我们可以在需要重新注入代码时，把输出内容的代码注入类删除即可保证任务正常执行，同时也可以保证缓存使用加快编译速度。
+**决解方法：** 基于第4点输入和输出快照变化会使Taask执行条件为true，所以我们可以在需要重新注入代码时，把输出内容的代码注入文件删除即可保证任务正常执行，同时也可以保证缓存使用加快编译速度。
 
 ```groovy
 class CacheUtils {
