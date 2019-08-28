@@ -1,0 +1,38 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies {
+    //gradle sdk
+    implementation gradleApi()
+    //groovy sdk
+    implementation localGroovy()
+
+    //noinspection GradleDependency
+    implementation "com.android.tools.build:gradle:3.2.0"
+//    implementation "org.javassist:javassist:3.20.0-GA"
+//    implementation "commons-io:commons-io:2.6"
+}
+
+// com.owm.component:register:1.0.5
+// -------- 本地配置 --------
+gradle.ext.localMaven.groupIdName = 'com.owm.svn'
+gradle.ext.localMaven.artifactIdName = 'ignore'
+gradle.ext.localMaven.versionName = '1.0.1'
+
+// -------- bintray 配置 --------
+gradle.ext.bintray.groupIdName = gradle.ext.localMaven.groupIdName
+gradle.ext.bintray.artifactIdName = gradle.ext.localMaven.artifactIdName
+gradle.ext.bintray.versionName = gradle.ext.localMaven.versionName
+gradle.ext.bintray.pkgRepo = "svn ignore"
+gradle.ext.bintray.pkgName = "svn ignore"
+gradle.ext.bintray.pkgDes = "svn ignore"
+
+
+// 发布到 plugins.gradle.org 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> plugin portal -> publishPlugins
+//apply from: "../script/gradlePlugins.gradle"
+
+// 发布到本地maven仓库 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> upload -> uploadArchives
+apply from: "../script/localeMaven.gradle"
+
+//发布 Jcenter 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> publishing -> bintrayUpload
+//apply from: '../script/bintray.gradle'

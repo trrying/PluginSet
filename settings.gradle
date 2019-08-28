@@ -1,1 +1,1 @@
-include ':app', ':ComponentRegister', ':LibApi', ':ModuleLogin'
+include ':app', ':ComponentRegister', ':LibApi', ':ModuleLogin', ':SvnIgnore'
