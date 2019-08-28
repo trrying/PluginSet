@@ -9,18 +9,17 @@ Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 //使用： classpath '${group}:${project.archivesBaseName}:${version}'
-group = gradle.groupIdName
-project.archivesBaseName = gradle.artifactIdName
-version = gradle.versionName
+group = gradle.bintray.groupIdName
+project.archivesBaseName = gradle.bintray.artifactIdName
+version = gradle.bintray.versionName
 
-def bintrayPkgRepo = "component-register"
-def bintrayPkgName = "component-register"
-def bintrayPkgDes = "component register"
+def bintrayPkgRepo = gradle.bintray.pkgRepo
+def bintrayPkgName = gradle.bintray.pkgName
+def bintrayPkgDes = gradle.bintray.pkgDes
 
-def siteUrl = 'https://github.com/trrying/PluginSet'
-def gitUrl = 'https://github.com/trrying/PluginSet.git'
-def issueUrl = 'https://github.com/trrying/PluginSet/issues'
-
+def siteUrl = gradle.bintray.siteUrl
+def gitUrl = gradle.bintray.gitUrl
+def issueUrl = gradle.bintray.issueUrl
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'

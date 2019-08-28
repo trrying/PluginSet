@@ -1,9 +1,5 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-gradle.ext.groupIdName = 'com.owm.component'
-gradle.ext.artifactIdName = 'register'
-gradle.ext.versionName = '1.1.2'
-
 buildscript {
     repositories {
         google()
@@ -45,3 +41,28 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
+// ======= 发布参数默认设置 =========
+//使用： classpath '${group}:${project.archivesBaseName}:${version}'
+// -------- 本地配置 --------
+gradle.ext.localMaven = [:]
+gradle.ext.localMaven.groupIdName = "com.owm.${project.name}"
+gradle.ext.localMaven.artifactIdName = "${project.name}"
+gradle.ext.localMaven.versionName = '1.1.2'
+
+// -------- bintray 配置 --------
+gradle.ext.bintray = [:]
+gradle.ext.bintray.groupIdName = gradle.ext.localMaven.groupIdName
+gradle.ext.bintray.artifactIdName = gradle.ext.localMaven.artifactIdName
+gradle.ext.bintray.versionName = gradle.ext.localMaven.versionName
+// default = "component register"
+gradle.ext.bintray.pkgRepo = "${project.name}"
+gradle.ext.bintray.pkgName = "${project.name}"
+gradle.ext.bintray.pkgDes = "${project.name}"
+// https://github.com/trrying/PluginSet
+gradle.ext.bintray.siteUrl = "https://github.com/trrying/PluginSet"
+// https://github.com/trrying/PluginSet.git
+gradle.ext.bintray.gitUrl = "https://github.com/trrying/PluginSet.git"
+// https://github.com/trrying/PluginSet/issues
+gradle.ext.bintray.issueUrl = "https://github.com/trrying/PluginSet/issues"

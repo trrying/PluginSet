@@ -1,6 +1,6 @@
 apply plugin: "com.gradle.plugin-publish"
-
-version = gradle.versionName
+// 废弃，不好用
+version = gradle.ext.localMaven.versionName
 
 // 打包到 https://plugins.gradle.org
 pluginBundle {
