@@ -56,13 +56,15 @@ gradle.ext.bintray = [:]
 gradle.ext.bintray.groupIdName = gradle.ext.localMaven.groupIdName
 gradle.ext.bintray.artifactIdName = gradle.ext.localMaven.artifactIdName
 gradle.ext.bintray.versionName = gradle.ext.localMaven.versionName
-// default = "component register"
-gradle.ext.bintray.pkgRepo = "${project.name}"
-gradle.ext.bintray.pkgName = "${project.name}"
+
+// * bintray 上面 Package名字
+gradle.ext.bintray.pkgRepo = ""
+// * bintray 上面项目名
+gradle.ext.bintray.pkgName = ""
+// * bintray 上面项目描述
 gradle.ext.bintray.pkgDes = "${project.name}"
-// https://github.com/trrying/PluginSet
+
+// 本项目github
 gradle.ext.bintray.siteUrl = "https://github.com/trrying/PluginSet"
-// https://github.com/trrying/PluginSet.git
 gradle.ext.bintray.gitUrl = "https://github.com/trrying/PluginSet.git"
-// https://github.com/trrying/PluginSet/issues
 gradle.ext.bintray.issueUrl = "https://github.com/trrying/PluginSet/issues"

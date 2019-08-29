@@ -13,6 +13,25 @@ dependencies {
     implementation "commons-io:commons-io:2.6"
 }
 
+
+//使用： classpath '${group}:${project.archivesBaseName}:${version}'
+// -------- 本地配置 --------
+gradle.ext.localMaven.groupIdName = 'com.owm.component'
+gradle.ext.localMaven.artifactIdName = 'register'
+gradle.ext.localMaven.versionName = '1.1.2'
+
+// -------- bintray 配置 --------
+gradle.ext.bintray.groupIdName = gradle.ext.localMaven.groupIdName
+gradle.ext.bintray.artifactIdName = gradle.ext.localMaven.artifactIdName
+gradle.ext.bintray.versionName = gradle.ext.localMaven.versionName
+// bintray 上面 Package名字
+gradle.ext.bintray.pkgRepo = "component-register"
+// bintray 上面项目名
+gradle.ext.bintray.pkgName = "component-register"
+// bintray 上面项目描述
+gradle.ext.bintray.pkgDes = "component-register"
+
+
 // 发布到 plugins.gradle.org 双击Gradle面板 PluginSet:ComponentRegister -> Tasks -> plugin portal -> publishPlugins
 apply from: "../script/gradlePlugins.gradle"
 
