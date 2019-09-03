@@ -17,7 +17,7 @@ dependencies {
 // -------- 本地配置 --------
 gradle.ext.localMaven.groupIdName = 'com.owm.svn'
 gradle.ext.localMaven.artifactIdName = 'ignore'
-gradle.ext.localMaven.versionName = '1.0.1'
+gradle.ext.localMaven.versionName = '1.0.2'
 
 // -------- bintray 配置 --------
 gradle.ext.bintray.groupIdName = gradle.ext.localMaven.groupIdName
